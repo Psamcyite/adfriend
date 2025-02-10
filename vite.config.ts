@@ -1,22 +1,27 @@
 import { defineConfig } from 'vite'
 import { crx } from '@crxjs/vite-plugin'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 import manifest from './src/manifest'
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   return {
     build: {
       emptyOutDir: true,
       outDir: 'build',
       rollupOptions: {
-        output: {
-          chunkFileNames: 'assets/chunk-[hash].js',
+        onwarn(warning, warn) {
+          if (warning.code === 'UNRESOLVED_IMPORT') {
+            console.warn('⚠️ Rollup could not resolve:', warning.source);
+          }
+          warn(warning);
         },
       },
     },
-
-    plugins: [crx({ manifest }), react()],
+    plugins: [
+      crx({ manifest }), react(),
+      tailwindcss(),
+    ],
   }
 })
